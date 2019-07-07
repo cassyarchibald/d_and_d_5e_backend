@@ -25,12 +25,26 @@ func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/classes", returnAllClasses)
+	myRouter.HandleFunc("/classes/{name}", returnSingleClass)
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
 
 func returnAllClasses(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Show all classes")
 	json.NewEncoder(w).Encode(Classes)
+}
+
+func returnSingleClass(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Show one class")
+
+	vars := mux.Vars(r)
+	key := vars["name"]
+
+	for _, class := range Classes {
+		if class.Name == key {
+			json.NewEncoder(w).Encode(class)
+		}
+	}
 }
 
 func main() {
