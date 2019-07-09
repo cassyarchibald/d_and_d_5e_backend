@@ -1,20 +1,18 @@
 package main
 
 import (
+	class "dndclass"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
-// Class - Struct for D&D Classes
-type Class struct {
-	Name string `json:"name"`
-}
-
-var Classes []Class
+// Classes
+var Classes []class.DndClass
 
 func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to the Homepage!")
@@ -29,8 +27,23 @@ func handleRequests() {
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
 
+func loadClasses() {
+	response, err := http.Get("https://api-beta.open5e.com/classes/")
+	if err != nil {
+		fmt.Printf("The Http request failed with error %s\n", err)
+		return
+	} else {
+		// var result []DndClass
+		// data[results].each do |result|
+		// 	result << DndClass.new(resultl[name])
+		data, _ := ioutil.ReadAll(response.Body)
+		fmt.Println(string(data))
+	}
+}
+
 func returnAllClasses(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Show all classes")
+	loadClasses()
 	json.NewEncoder(w).Encode(Classes)
 }
 
@@ -48,9 +61,9 @@ func returnSingleClass(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	Classes = []Class{
-		Class{Name: "Cassy"},
-		Class{Name: "Cindy"},
+	Classes = []DndClass{
+		DndClass{Name: "Cassy"},
+		DndClass{Name: "Cindy"},
 	}
 	handleRequests()
 }
